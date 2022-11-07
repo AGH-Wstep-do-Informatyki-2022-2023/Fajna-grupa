@@ -27,7 +27,7 @@ shoot = False
 
 # load images
 # obraz pocisku
-bullet_img = pygame.image.load('bullet.png').convert_alpha()
+fireball_img = pygame.image.load('fireball.png').convert_alpha()
 
 #define colours
 BG = (180,205,240)
@@ -48,6 +48,7 @@ class Character(pygame.sprite.Sprite):
         self.flip = False
         self.ammo = ammo            # amunicja
         self.start_ammo = ammo      # startowa amunicja
+        self.reload = False
         self.shoot_cooldown = 0     # cooldown po strzale
         pygame.sprite.Sprite.__init__(self)
         image = pygame.image.load(image)
@@ -97,27 +98,35 @@ class Character(pygame.sprite.Sprite):
     def shoot(self):
         if self.shoot_cooldown == 0 and self.ammo > 0:
             self.shoot_cooldown = 20
-            bullet = Bullet(self.rect.centerx + (0.6 * self.rect.size[0] * self.direction), self.rect.centery, self.direction)
-            bullet_group.add(bullet)
+            fireball = Fireball(self.rect.centerx + (0.6 * self.rect.size[0] * self.direction), self.rect.centery, self.direction, self.flip)
+            fireball_group.add(fireball)
             # zmniejszenie ammo o 1
             self.ammo -= 1
         # cooldown
         if self.shoot_cooldown > 0:
             self.shoot_cooldown -= 1
+        if self.reload:
+            self.ammo = 25
 
     def draw(self):
-        screen.blit(pygame.transform.flip(self.image, self.flip, False),self.rect)
+        screen.blit(pygame.transform.flip(self.image, self.flip, False), self.rect)
 
 # Doadałem cala klase do maina, bo i tak dużo zmian musialem wprowadzic w oryginalnym kodzie gry
 
-class Bullet(pygame.sprite.Sprite):
-    def __init__(self, x, y, direction):
+class Fireball(pygame.sprite.Sprite):
+    def __init__(self, x, y, direction, flip):
         pygame.sprite.Sprite.__init__(self)
         self.speed = 10
-        self.image = bullet_img
+        self.image = fireball_img
+        self.direction = direction
+        self.flip = flip
+        self.scale = 0.05
+        self.image = pygame.transform.scale(self.image, (self.image.get_width() * self.scale, self.image.get_height() * self.scale))
+        self.image = pygame.transform.flip(self.image, self.flip, False)
         self.rect = self.image.get_rect()
         self.rect.center = (x, y)
-        self.direction = direction
+
+
 
     def update(self):
         # ruch pocisku
@@ -125,6 +134,7 @@ class Bullet(pygame.sprite.Sprite):
         # sprawdzanie czy pocisk wyszedl poza ekran
         if self.rect.right < 0 or self.rect.left > SCREEN_WIDTH:
             self.kill()
+
 
         """
         # sprawdzenie kolizji z obiektami
@@ -143,7 +153,7 @@ class Bullet(pygame.sprite.Sprite):
 player = Character('mariusz.jpg',200, 200, 0.05, 3, 25)
 enemy = Character('rocky.jpg', 400, 200, 0.15, 2, 25)
 
-bullet_group = pygame.sprite.Group()
+fireball_group = pygame.sprite.Group()
 
 run = True
 while run:
@@ -152,13 +162,13 @@ while run:
     clock.tick(FPS)
     draw_bg()
     player.draw()
-    player.move(Player_move_left,Player_move_right)
+    player.move(Player_move_left, Player_move_right)
     enemy.draw()
     debug(pygame.mouse.get_pos())
 
     # potrzebne do strzelania
-    bullet_group.update()
-    bullet_group.draw(screen)
+    fireball_group.update()
+    fireball_group.draw(screen)
 
     # strzelanie
     if shoot:
@@ -184,6 +194,9 @@ while run:
             # strzelanie
             if event.key == pygame.K_SPACE:
                 shoot = True
+            if event.key == pygame.K_r:
+                player.reload = True
+
 
         #keyboard released
         if event.type == pygame.KEYUP:
