@@ -22,8 +22,8 @@ Do gry wykorzystujemy bibliotekę Pygame oraz dostępne w sieci grafiki
 
 ## Przydatne linki
 
-[Pygame](https://www.pygame.org/)
-[Ikonki](https://www.flaticon.com/)
-[Czcionki](https://www.dafont.com/)
-[Kontakt](https://discord.com/)
-[Kontakt(opcjonalnie)](https://poczta.agh.edu.pl)
+[Pygame](https://www.pygame.org/)/
+[Ikonki](https://www.flaticon.com/)/
+[Czcionki](https://www.dafont.com/)/
+[Kontakt](https://discord.com/)/
+[Kontakt(opcjonalnie)](https://poczta.agh.edu.pl)/
