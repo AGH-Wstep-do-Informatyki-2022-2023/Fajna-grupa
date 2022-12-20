@@ -9,6 +9,7 @@ screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption("Fajna Gra")
 
 #debug text
+# test
 def debug(info, x = 10 , y = 10):
     display_surface = pygame.display.get_surface()
     debug_surf = pygame.font.Font(None, 30).render(str(info), True, 'Black')
