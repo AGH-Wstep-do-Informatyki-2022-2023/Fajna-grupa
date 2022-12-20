@@ -150,6 +150,8 @@ class Fireball(pygame.sprite.Sprite):
                 self.kill()
         """
 
+# Bardzo dobrze idzie nam pisanie tej gry XD
+
 player = Character('mariusz.jpg',200, 200, 0.05, 3, 25)
 enemy = Character('rocky.jpg', 400, 200, 0.15, 2, 25)
 
