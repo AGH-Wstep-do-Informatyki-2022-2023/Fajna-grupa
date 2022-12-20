@@ -170,7 +170,7 @@ while run:
     fireball_group.update()
     fireball_group.draw(screen)
 
-    # strzelanie
+    # strzelanie:
     if shoot:
         player.shoot()
 
