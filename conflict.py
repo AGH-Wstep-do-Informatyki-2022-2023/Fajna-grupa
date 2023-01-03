@@ -1,0 +1,1 @@
+#plik do wygenerowania konfliktu
