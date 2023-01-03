@@ -1,2 +1,0 @@
-#conflict
-#wywołanie konfliktu
