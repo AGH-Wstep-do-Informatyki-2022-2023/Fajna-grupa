@@ -1,4 +1,0 @@
-Przykładowy plik który po usunięciu pozwoli wygenerować konflikt
-
-
-Nowa treść w pliku który zostanie usunięty w gałęzi main
