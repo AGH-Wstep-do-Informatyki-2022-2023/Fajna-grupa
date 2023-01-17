@@ -213,8 +213,8 @@ class Fireball(pygame.sprite.Sprite):
 
 player = Character('mariusz.jpg',200, 200, 0.05, 3, 25)
 enemy = Character('rocky.jpg', 400, 200, 0.15, 2, 25)
-enemy2 = Character('rocky.jpg', 250, 200, 0.15, 2, 25)
-enemy3 = Character('rocky.jpg', 100, 200, 0.15, 2, 25)
+enemy2 = Character('rocky.jpg', 550, 200, 0.15, 2, 25)
+enemy3 = Character('rocky.jpg', 700, 200, 0.15, 2, 25)
 
 fireball_group = pygame.sprite.Group()
 enemy_group = pygame.sprite.Group()
