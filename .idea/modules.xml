@@ -2,11 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-<<<<<<< HEAD
-      <module fileurl="file://$PROJECT_DIR$/.idea/fajna_grupa.iml" filepath="$PROJECT_DIR$/.idea/fajna_grupa.iml" />
-=======
-      <module fileurl="file://$PROJECT_DIR$/.idea/Fajna-grupa.iml" filepath="$PROJECT_DIR$/.idea/Fajna-grupa.iml" />
->>>>>>> origin/main
+      <module fileurl="file://$PROJECT_DIR$/.idea/Fajna-grupa-main.iml" filepath="$PROJECT_DIR$/.idea/Fajna-grupa-main.iml" />
     </modules>
   </component>
 </project>

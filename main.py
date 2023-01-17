@@ -1,9 +1,11 @@
 import pygame
+import random
 
 pygame.init()
 
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
+TILE_SIZE = 40
 
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption("Fajna Gra")
@@ -41,7 +43,13 @@ def draw_bg():
 class Character(pygame.sprite.Sprite):
     def __init__(self, image, x, y, scale, speed, ammo):
         self.jump_counter = 0
+        self.alive = True
         self.image = image
+        self.health = 100
+        self.max_health = self.health
+        self.frame_index = 0
+        self.action = 0
+        self.update_time = pygame.time.get_ticks()
         self.speed = speed
         self.direction = 1
         self.jump = False
@@ -56,6 +64,18 @@ class Character(pygame.sprite.Sprite):
         self.image = pygame.transform.scale(image,(image.get_width() * scale, image.get_height() * scale))
         self.rect = self.image.get_rect()
         self.rect.center = (x, y)
+        # ai specific variables
+        self.move_counter = 0
+        self.vision = pygame.Rect(0, 0, 150, 20)
+        self.idling = False
+        self.idling_counter = 0
+
+    def update(self):
+        self.check_alive()
+        # update cooldown
+        if self.shoot_cooldown > 0:
+            self.shoot_cooldown -= 1
+
     def move(self, moving_left, moving_right):
         #reset variables
         dx = 0
@@ -97,22 +117,63 @@ class Character(pygame.sprite.Sprite):
 
 # metoda do strzelania
     def shoot(self):
-        if self.shoot_cooldown == 0 and self.ammo > 0:
-            self.shoot_cooldown = 20
+        if self.shoot_cooldown == 0: # and self.ammo > 0:
+            self.shoot_cooldown = 40
             fireball = Fireball(self.rect.centerx + (0.6 * self.rect.size[0] * self.direction), self.rect.centery, self.direction, self.flip)
             fireball_group.add(fireball)
             # zmniejszenie ammo o 1
             self.ammo -= 1
-        # cooldown
-        if self.shoot_cooldown > 0:
-            self.shoot_cooldown -= 1
         if self.reload:
             self.ammo = 25
 
     def draw(self):
         screen.blit(pygame.transform.flip(self.image, self.flip, False), self.rect)
 
-# Doadałem cala klase do maina, bo i tak dużo zmian musialem wprowadzic w oryginalnym kodzie gry
+    def update_action(self, new_action):
+        # check if the new action is different to the previous one
+        if new_action != self.action:
+            self.action = new_action
+            # update the animation settings
+            self.frame_index = 0
+            self.update_time = pygame.time.get_ticks()
+
+    def ai(self):
+        if self.alive and player.alive:
+            if self.idling == False and random.randint(1, 200) == 1:
+                self.update_action(0)# 0: idle
+                self.idling = True
+                self.idling_counter = 50
+            # check if the AI is near the player
+            if self.vision.colliderect(player.rect):
+                self.update_action(0)# 0: idle
+                self.shoot()
+            else:
+                if self.idling == False:
+                    if self.direction == 1:
+                        ai_moving_right = True
+                    else:
+                        ai_moving_right = False
+                    ai_moving_left = not ai_moving_right
+                    self.move(ai_moving_left, ai_moving_right)
+                    self.update_action(1)# 1: run
+                    self.move_counter += 1
+                    # update AI vision as the enemy moves
+                    self.vision.center = (self.rect.centerx + 75 * self.direction, self.rect.centery)
+
+                    if self.move_counter > TILE_SIZE:
+                        self.direction *= -1
+                        self.move_counter *= -1
+                else:
+                    self.idling_counter -= 1
+                    if self.idling_counter <= 0:
+                        self.idling = False
+
+    def check_alive(self):
+        if self.health <= 0:
+            self.health = 0
+            self.speed = 0
+            self.alive = False
+            self.update_action(3)
 
 class Fireball(pygame.sprite.Sprite):
     def __init__(self, x, y, direction, flip):
@@ -136,27 +197,30 @@ class Fireball(pygame.sprite.Sprite):
         if self.rect.right < 0 or self.rect.left > SCREEN_WIDTH:
             self.kill()
 
-
-        """
         # sprawdzenie kolizji z obiektami
         # do zrobienia na pozniej
 
-        if pygame.sprite.spritecollide(player, bullet_group, False):
+        """if pygame.sprite.spritecollide(player, fireball_group, False):
             if player.alive:
                 player.health -= 5
-                self.kill()
-        if pygame.sprite.spritecollide(enemy, bullet_group, False):
+                self.kill()"""
+        if pygame.sprite.spritecollide(enemy, fireball_group, False):
             if enemy.alive:
                 enemy.health -= 25
                 self.kill()
-        """
 
 # Bardzo dobrze idzie nam pisanie tej gry XD ta
 
 player = Character('mariusz.jpg',200, 200, 0.05, 3, 25)
 enemy = Character('rocky.jpg', 400, 200, 0.15, 2, 25)
+enemy2 = Character('rocky.jpg', 250, 200, 0.15, 2, 25)
+enemy3 = Character('rocky.jpg', 100, 200, 0.15, 2, 25)
 
 fireball_group = pygame.sprite.Group()
+enemy_group = pygame.sprite.Group()
+enemy_group.add(enemy)
+enemy_group.add(enemy2)
+enemy_group.add(enemy3)
 
 run = True
 while run:
@@ -165,13 +229,22 @@ while run:
     clock.tick(FPS)
     draw_bg()
     player.draw()
+    player.update()
     player.move(Player_move_left, Player_move_right)
-    enemy.draw()
+
     debug(pygame.mouse.get_pos())
 
     # potrzebne do strzelania
     fireball_group.update()
     fireball_group.draw(screen)
+
+    player.update()
+    player.draw()
+
+    for enemy in enemy_group:
+        enemy.ai()
+        enemy.update()
+        enemy.draw()
 
     # strzelanie:
     if shoot:
